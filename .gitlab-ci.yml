@@ -1,0 +1,6 @@
+include:
+    remote: https://gitlab.com/vsmods-public/foundation/vsmodtemplate/-/raw/0.5.16/.gitlab-ci.yml
+
+variables:
+    TARGET_NAME:
+        value: "TraitLearner"

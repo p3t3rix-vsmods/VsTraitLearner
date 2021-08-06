@@ -1,0 +1,11 @@
+{
+  "type": "code",
+  "modid": "traitlearner",
+  "name": "TraitLearner",
+  "author": "<insert your name here>",
+  "description": "<insert your mod description here>",
+  "version": "0.1.0",
+  "dependencies": {
+    "game": ""
+  }
+}
