@@ -10,6 +10,7 @@ namespace TraitLearner.ModSystem
     using CommandSystem2.Entities.VSCommand;
     using Exceptions;
     using ExtensionMethods;
+    using Logic;
     using Vintagestory.API.Common;
     using Vintagestory.GameContent;
 
@@ -20,7 +21,6 @@ namespace TraitLearner.ModSystem
         //TODO: patch postfix into getTraitText
         //TODO: make rightclick behaviour for items to add trait
         //TODO: make example recipes for common traits
-
 
         [VSCommand("status")]
         [VSCommandDescription("Get the status of your current Traits (class and learned)")]
@@ -35,6 +35,7 @@ namespace TraitLearner.ModSystem
             {
                 message.AppendLine("- " + trait);
             }
+
             message.AppendLine("extra:");
 
             var extraTraits = context.ServerPlayer.GetExtraTraits()?.ToList() ?? new List<string>();
@@ -54,11 +55,9 @@ namespace TraitLearner.ModSystem
             var player = GetPlayer(context, playerName);
             var trait = GetTrait(context, traitName);
 
-            var attributes = player.Entity.WatchedAttributes;
-            var extraTraits = player.GetExtraTraits()?.ToList() ?? new List<string>();
-            extraTraits.Add(trait.Code);
-            attributes.SetStringArray("extraTraits", extraTraits.Distinct().ToArray());
-            this.ApplyTraitAttributes(context, player.Entity);
+            var logic = new ExtraTraitManagementLogic(GetCharacterSystem(context));
+            logic.Add(player, trait);
+
             context.SendCommandMessage($"trait {traitName} added to {player.PlayerName}", EnumChatType.CommandSuccess);
         }
 
@@ -69,11 +68,10 @@ namespace TraitLearner.ModSystem
         {
             var player = GetPlayer(context, playerName);
             var trait = GetTrait(context, traitName);
-            var attributes = player.Entity.WatchedAttributes;
-            var extraTraits = player.GetExtraTraits()?.ToList() ?? new List<string>();
-            extraTraits.Remove(trait.Code);
-            attributes.SetStringArray("extraTraits", extraTraits.Distinct().ToArray());
-            this.ApplyTraitAttributes(context, player.Entity);
+
+            var logic = new ExtraTraitManagementLogic(GetCharacterSystem(context));
+            logic.Remove(player, trait);
+
             context.SendCommandMessage($"trait {traitName} removed from {player.PlayerName}", EnumChatType.CommandSuccess);
         }
 
@@ -83,11 +81,13 @@ namespace TraitLearner.ModSystem
         public async Task Reset(CommandContext context, string playerName = null)
         {
             var player = GetPlayer(context, playerName);
-            var attributes = player.Entity.WatchedAttributes;
-            attributes.SetStringArray("extraTraits", new string[0]);
-            this.ApplyTraitAttributes(context, player.Entity);
+
+            var logic = new ExtraTraitManagementLogic(GetCharacterSystem(context));
+            logic.Reset(player);
+
             context.SendCommandMessage($"traits reset for {player.PlayerName}", EnumChatType.CommandSuccess);
         }
+
         private static IPlayer GetPlayer(CommandContext context, string playerName)
         {
             var player = playerName == null ? context.ServerPlayer : context.ServerAPI.World.AllPlayers.FirstOrDefault(p => p.PlayerName == playerName);
@@ -105,10 +105,6 @@ namespace TraitLearner.ModSystem
             return context.ServerAPI.ModLoader.GetModSystem<CharacterSystem>();
         }
 
-        private void ApplyTraitAttributes(CommandContext context, EntityPlayer player)
-        {
-            GetCharacterSystem(context).ApplyTraitAttributes(player);
-        }
         private static Trait GetTrait(CommandContext context, string traitName)
         {
             var charSystem = GetCharacterSystem(context);
