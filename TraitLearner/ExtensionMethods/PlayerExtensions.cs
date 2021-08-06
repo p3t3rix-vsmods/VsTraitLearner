@@ -9,7 +9,7 @@ namespace TraitLearner.ExtensionMethods
             return player.Entity.WatchedAttributes.GetString("characterClass");
         }
 
-        public static string[] GetExtraTraits(this IPlayer player)
+        public static string[] GetExtraTraitNames(this IPlayer player)
         {
             return player.GetAttribute<string[]>("extraTraits");
         }

@@ -2,7 +2,9 @@ namespace TraitLearner.ModSystem
 {
     using CommandSystem2;
     using Foundation.ModConfig;
+    using HarmonyLib;
     using ModConfig;
+    using Patches;
     using Vintagestory.API.Common;
     using Vintagestory.API.Server;
     using Vintagestory.API.Client;
@@ -11,15 +13,18 @@ namespace TraitLearner.ModSystem
     {
         public ModConfig Config { get; set; }
 
-
         public override bool ShouldLoad(EnumAppSide forSide)
         {
             return true;
         }
 
-        public override void StartServerSide(ICoreServerAPI api)
+        public override void Start(ICoreAPI api)
         {
             this.Config = api.LoadOrCreateConfig<ModConfig>(this);
+        }
+
+        public override void StartServerSide(ICoreServerAPI api)
+        {
             this.RegisterCommands(api);
         }
 
@@ -31,7 +36,9 @@ namespace TraitLearner.ModSystem
 
         public override void StartClientSide(ICoreClientAPI api)
         {
+            var harmony = new Harmony(nameof(TraitLearnerSystem));
 
+            ComposeTraitsTabPatch.Initialize(harmony, api, this.Config);
         }
     }
 }

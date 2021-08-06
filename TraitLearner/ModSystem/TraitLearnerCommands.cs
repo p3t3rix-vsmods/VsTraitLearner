@@ -38,7 +38,7 @@ namespace TraitLearner.ModSystem
 
             message.AppendLine("extra:");
 
-            var extraTraits = context.ServerPlayer.GetExtraTraits()?.ToList() ?? new List<string>();
+            var extraTraits = context.ServerPlayer.GetExtraTraitNames()?.ToList() ?? new List<string>();
             foreach (var extra in extraTraits)
             {
                 message.AppendLine("- " + extra);
