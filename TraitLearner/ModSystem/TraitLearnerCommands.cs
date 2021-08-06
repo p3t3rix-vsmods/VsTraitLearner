@@ -1,14 +1,14 @@
 namespace TraitLearner.ModSystem
 {
-    using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
     using CommandSystem2.Attributes;
+    using CommandSystem2.Attributes.CheckAttributes;
     using CommandSystem2.Entities.VSCommand;
+    using Exceptions;
     using ExtensionMethods;
     using Vintagestory.API.Common;
     using Vintagestory.GameContent;
@@ -20,18 +20,15 @@ namespace TraitLearner.ModSystem
         //TODO: patch postfix into getTraitText
         //TODO: make rightclick behaviour for items to add trait
         //TODO: make example recipes for common traits
-        //TODO: check if attributes are affected by added traits
-
 
 
         [VSCommand("status")]
         [VSCommandDescription("Get the status of your current Traits (class and learned)")]
         public async Task Status(CommandContext context)
         {
-            var playerAttributes = context.ServerPlayer.Entity.WatchedAttributes;
-            var charClass = playerAttributes.GetString("characterClass");
+            var charClass = context.ServerPlayer.GetCharacterClass();
 
-            var charSystem = context.ServerAPI.ModLoader.GetModSystem<CharacterSystem>();
+            var charSystem = GetCharacterSystem(context);
             var message = new StringBuilder($"Current Traits ({charClass}) \n");
             message.AppendLine("from class:");
             foreach (var trait in charSystem.characterClassesByCode[charClass].Traits)
@@ -40,9 +37,8 @@ namespace TraitLearner.ModSystem
             }
             message.AppendLine("extra:");
 
-            var extraTraits = context.ServerPlayer.Entity.WatchedAttributes.GetStringArray("extraTraits");
-
-            foreach (var extra in extraTraits ?? Enumerable.Empty<string>())
+            var extraTraits = context.ServerPlayer.GetExtraTraits()?.ToList() ?? new List<string>();
+            foreach (var extra in extraTraits)
             {
                 message.AppendLine("- " + extra);
             }
@@ -52,74 +48,79 @@ namespace TraitLearner.ModSystem
 
         [VSCommand("add")]
         [VSCommandDescription("Add a trait to the player with the given name (use the current player if no name is specified)")]
-        public async Task Add(CommandContext context, string traitName, string playername = null)
+        [VSCommandRequirePermission(PermissionCheckMode.Any, "root")]
+        public async Task Add(CommandContext context, string traitName, string playerName = null)
         {
-            var player = playername == null ? context.ServerPlayer : context.ServerAPI.World.AllPlayers.FirstOrDefault(p => p.PlayerName == playername);
-            var charSystem = context.ServerAPI.ModLoader.GetModSystem<CharacterSystem>();
-            if (player == null)
-            {
-                context.SendCommandMessage($"No player found with the name {playername}",EnumChatType.CommandError);
-                return;
-            }
+            var player = GetPlayer(context, playerName);
+            var trait = GetTrait(context, traitName);
 
-            var trait = charSystem.traits.FirstOrDefault(t => t.Code == traitName);
-            if (trait == null)
-            {
-                context.SendCommandMessage($"No trait found with the name {traitName}", EnumChatType.CommandError);
-                return;
-            }
             var attributes = player.Entity.WatchedAttributes;
-            var extraTraits = attributes.GetStringArray("extraTraits")?.ToList() ?? new List<string>();
+            var extraTraits = player.GetExtraTraits()?.ToList() ?? new List<string>();
             extraTraits.Add(trait.Code);
-            attributes.SetStringArray("extraTraits", extraTraits.ToArray());
+            attributes.SetStringArray("extraTraits", extraTraits.Distinct().ToArray());
+            this.ApplyTraitAttributes(context, player.Entity);
             context.SendCommandMessage($"trait {traitName} added to {player.PlayerName}", EnumChatType.CommandSuccess);
         }
 
         [VSCommand("remove")]
         [VSCommandDescription("Remove a trait to the player with the given name (use the current player if no name is specified)")]
-        public async Task Remove(CommandContext context, string traitName, string playername = null)
+        [VSCommandRequirePermission(PermissionCheckMode.Any, "root")]
+        public async Task Remove(CommandContext context, string traitName, string playerName = null)
         {
-            var player = playername == null ? context.ServerPlayer : context.ServerAPI.World.AllPlayers.FirstOrDefault(p => p.PlayerName == playername);
-            if (player == null)
-            {
-                context.SendCommandMessage($"No player found with the name {playername}", EnumChatType.CommandError);
-                return;
-            }
-
-            var charSystem = context.ServerAPI.ModLoader.GetModSystem<CharacterSystem>();
-            var trait = charSystem.traits.FirstOrDefault(t => t.Code == traitName);
-            if (trait == null)
-            {
-                context.SendCommandMessage($"No trait found with the name {traitName}", EnumChatType.CommandError);
-                return;
-            }
+            var player = GetPlayer(context, playerName);
+            var trait = GetTrait(context, traitName);
             var attributes = player.Entity.WatchedAttributes;
-            var extraTraits = attributes.GetStringArray("extraTraits")?.ToList() ?? new List<string>();
+            var extraTraits = player.GetExtraTraits()?.ToList() ?? new List<string>();
             extraTraits.Remove(trait.Code);
-            attributes.SetStringArray("extraTraits", extraTraits.ToArray());
+            attributes.SetStringArray("extraTraits", extraTraits.Distinct().ToArray());
+            this.ApplyTraitAttributes(context, player.Entity);
             context.SendCommandMessage($"trait {traitName} removed from {player.PlayerName}", EnumChatType.CommandSuccess);
         }
 
         [VSCommand("reset")]
         [VSCommandDescription("Resets traits (only class traits remain) of the player with the given name (use the current player if no name is specified)")]
-        public async Task Reset(CommandContext context, string playername = null)
+        [VSCommandRequirePermission(PermissionCheckMode.Any, "root")]
+        public async Task Reset(CommandContext context, string playerName = null)
         {
-            var player = playername == null ? context.ServerPlayer : context.ServerAPI.World.AllPlayers.FirstOrDefault(p => p.PlayerName == playername);
-            if (player == null)
-            {
-                context.SendCommandMessage($"No player found with the name {playername}", EnumChatType.CommandError);
-                return;
-            }
+            var player = GetPlayer(context, playerName);
             var attributes = player.Entity.WatchedAttributes;
             attributes.SetStringArray("extraTraits", new string[0]);
+            this.ApplyTraitAttributes(context, player.Entity);
             context.SendCommandMessage($"traits reset for {player.PlayerName}", EnumChatType.CommandSuccess);
         }
-
-        [VSCommand()]
-        [VSCommandDescription("all the good stuff")]
-        public async Task Test(CommandContext context)
+        private static IPlayer GetPlayer(CommandContext context, string playerName)
         {
-            throw new ArgumentException("asdf");
+            var player = playerName == null ? context.ServerPlayer : context.ServerAPI.World.AllPlayers.FirstOrDefault(p => p.PlayerName == playerName);
+            if (player == null)
+            {
+                context.SendCommandMessage($"No player found with the name {playerName}", EnumChatType.CommandError);
+                throw new CommandException();
+            }
+
+            return player;
+        }
+
+        private static CharacterSystem GetCharacterSystem(CommandContext context)
+        {
+            return context.ServerAPI.ModLoader.GetModSystem<CharacterSystem>();
+        }
+
+        private void ApplyTraitAttributes(CommandContext context, EntityPlayer player)
+        {
+            GetCharacterSystem(context).ApplyTraitAttributes(player);
+        }
+        private static Trait GetTrait(CommandContext context, string traitName)
+        {
+            var charSystem = GetCharacterSystem(context);
+
+            var trait = charSystem.traits.FirstOrDefault(t => t.Code == traitName);
+            if (trait == null)
+            {
+                context.SendCommandMessage($"No trait found with the name {traitName}", EnumChatType.CommandError);
+                throw new CommandException();
+            }
+
+            return trait;
         }
     }
 }
