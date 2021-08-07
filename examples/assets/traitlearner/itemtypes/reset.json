@@ -1,0 +1,15 @@
+{
+  "code": "reset-book",
+  "creativeinventory": {
+    "general": [ "*" ]
+  },
+  "behaviors": [
+    {
+      "name": "ManageTrait",
+      "properties": {
+        "should_reset": true,
+        "usage_duration_in_seconds" : 4, 
+      }
+    }
+  ]
+}
