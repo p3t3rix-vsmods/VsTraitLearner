@@ -4,3 +4,6 @@ include:
 variables:
     TARGET_NAME:
         value: "TraitLearner"
+    ASSET_NUGET_URL:
+        value: "" # no nuget for us
+        
