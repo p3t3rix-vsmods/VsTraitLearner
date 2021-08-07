@@ -8,6 +8,7 @@
     </ItemGroup>
     <ItemGroup>
       <LibraryPath Include="$(OutputPath)" />
+      <LibraryPath Include="$(VINTAGE_STORY)" />
       <LibraryPath Include="$(VINTAGE_STORY)/Lib/" />
     </ItemGroup>
     <ItemGroup>
