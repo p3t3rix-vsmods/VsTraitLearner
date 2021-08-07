@@ -34,8 +34,8 @@ namespace TraitLearner.Patches
         public static bool PrefixComposeTraitsTab(CharacterSystem __instance, GuiComposer compo)
         {
             //TODO: put in scrollable container
-            compo.AddRichtext(__instance.GetClassTraitText(), CairoFont.WhiteDetailText().WithLineHeightMultiplier(1.15), ElementBounds.Fixed(0, 25, 385, 150));
-            compo.AddRichtext(GetExtraTraitsText(__instance), CairoFont.WhiteDetailText().WithLineHeightMultiplier(1.15), ElementBounds.Fixed(0, 175, 385, 150));
+            compo.AddRichtext(__instance.GetClassTraitText(), CairoFont.WhiteDetailText().WithLineHeightMultiplier(1), ElementBounds.Fixed(0, 25, 385, 125));
+            compo.AddRichtext(GetExtraTraitsText(__instance), CairoFont.WhiteDetailText().WithLineHeightMultiplier(1), ElementBounds.Fixed(0, 150, 385, 150));
 
             return false;
         }
