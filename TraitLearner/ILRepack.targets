@@ -47,20 +47,3 @@
     </ItemGroup>
   </Target>
 </Project>
-
-
-<!-- 
-new standard 2.0 solution with name of mod
-add assets folder
-add src folder
-copy VSModLauncher in
-add to solution
-set VSModLauncher build dependency to include mod
-set VSModLauncher as startup
-change command line arguments to include new mod's bin\Debug folder
-add nuget.config with nuget source
-add ILRepack.Lib.MSBuild.Task nuget package
-add ILRepack.targets file
-set .csproj > PackageReference > PrivateAssets="all"
-update .csproj with debug, copylocallock, reference to vintage story libs, copy modinfo.json to output always
--->
