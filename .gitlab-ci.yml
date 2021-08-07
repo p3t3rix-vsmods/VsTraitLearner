@@ -4,3 +4,7 @@ include:
 variables:
     TARGET_NAME:
         value: "TraitLearner"
+    ASSET_NUGET_URL:
+        value: "" # no nuget for us
+    GAME_DEPENDENCY_URL:
+        value: "https://cdn.vintagestory.at/gamefiles/stable/vs_server_1.15.3.tar.gz"
