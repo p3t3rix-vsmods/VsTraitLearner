@@ -3,6 +3,7 @@ namespace TraitLearner.CollectibleBehaviours
     using System.Collections.Generic;
     using System.Linq;
     using Logic;
+    using ModConfig;
     using Vintagestory.API.Client;
     using Vintagestory.API.Common;
     using Vintagestory.API.Datastructures;
@@ -106,7 +107,7 @@ namespace TraitLearner.CollectibleBehaviours
         {
             return new WorldInteraction[]
             {
-                new WorldInteraction(){MouseButton = EnumMouseButton.Right, ActionLangCode = $"{ModConfig.ModConfig.DomainName}:traitbehaviour_use"}
+                new WorldInteraction(){MouseButton = EnumMouseButton.Right, ActionLangCode = $"{Constants.DomainName}:traitbehaviour_use"}
             };
         }
     }
