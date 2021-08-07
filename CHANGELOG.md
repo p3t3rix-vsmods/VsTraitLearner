@@ -1,7 +1,7 @@
 ## 1.0.2 (2021-08-07)
 
-No changes.
+fix modinfo
 
 ## 1.0.1 (2021-08-07)
 
-No changes.
+Initial release
