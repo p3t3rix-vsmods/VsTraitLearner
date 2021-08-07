@@ -4,7 +4,7 @@
   "name": "TraitLearner",
   "author": "P3t3rix",
   "description": "Mod to manage additional Traits",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "dependencies": {
     "game": ""
   }
