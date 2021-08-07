@@ -8,8 +8,9 @@ namespace TraitLearner.ModConfig
 
     public class ModConfig : ModConfigBase, ICommandSystemConfig
     {
+        public const string DomainName = "traitlearner";
         //Foundation config:
-        public override string ModCode => "traitlearner";
+        public override string ModCode => DomainName;
 
         //Command System config:
         [JsonIgnore]

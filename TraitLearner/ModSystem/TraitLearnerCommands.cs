@@ -18,15 +18,11 @@ namespace TraitLearner.ModSystem
     [Description("Traitlearner commands")]
     public class TraitLearnerCommands
     {
-        //TODO: patch postfix into getTraitText
-        //TODO: make rightclick behaviour for items to add trait
-        //TODO: make example recipes for common traits
-
         [VSCommand("status")]
         [VSCommandDescription("Get the status of your current Traits (class and learned)")]
         public async Task Status(CommandContext context)
         {
-            var charClass = context.ServerPlayer.GetCharacterClass();
+            var charClass = context.ServerPlayer.Entity.GetCharacterClass();
 
             var charSystem = GetCharacterSystem(context);
             var message = new StringBuilder($"Current Traits ({charClass}) \n");
@@ -38,7 +34,7 @@ namespace TraitLearner.ModSystem
 
             message.AppendLine("extra:");
 
-            var extraTraits = context.ServerPlayer.GetExtraTraitNames()?.ToList() ?? new List<string>();
+            var extraTraits = context.ServerPlayer.Entity.GetExtraTraitNames()?.ToList() ?? new List<string>();
             foreach (var extra in extraTraits)
             {
                 message.AppendLine("- " + extra);

@@ -43,7 +43,7 @@ namespace TraitLearner.Patches
         public static string GetExtraTraitsText(CharacterSystem characterSystem)
         {
             var sb = new StringBuilder();
-            var extraTraitNames = Api.World.Player.GetExtraTraitNames();
+            var extraTraitNames = Api.World.Player.Entity.GetExtraTraitNames();
 
             var traitDic = characterSystem.TraitsByCode;
 

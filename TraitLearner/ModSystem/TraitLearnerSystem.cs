@@ -1,5 +1,6 @@
 namespace TraitLearner.ModSystem
 {
+    using CollectibleBehaviours;
     using CommandSystem2;
     using Foundation.ModConfig;
     using HarmonyLib;
@@ -21,6 +22,7 @@ namespace TraitLearner.ModSystem
         public override void Start(ICoreAPI api)
         {
             this.Config = api.LoadOrCreateConfig<ModConfig>(this);
+            api.RegisterCollectibleBehaviorClass("ManageTrait", typeof(ManageTraitBehaviour));
         }
 
         public override void StartServerSide(ICoreServerAPI api)
@@ -37,7 +39,6 @@ namespace TraitLearner.ModSystem
         public override void StartClientSide(ICoreClientAPI api)
         {
             var harmony = new Harmony(nameof(TraitLearnerSystem));
-
             ComposeTraitsTabPatch.Initialize(harmony, api, this.Config);
         }
     }
