@@ -1,4 +1,4 @@
-namespace TraitLearner.CollectibleBehaviours
+namespace TraitLearner.CollectibleBehaviors
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -9,7 +9,7 @@ namespace TraitLearner.CollectibleBehaviours
     using Vintagestory.API.Datastructures;
     using Vintagestory.GameContent;
 
-    public class ManageTraitBehaviour : CollectibleBehavior
+    public class ManageTraitBehavior : CollectibleBehavior
     {
 
         public List<string> TraitsToAdd { get; set; }
@@ -22,7 +22,7 @@ namespace TraitLearner.CollectibleBehaviours
         public ICoreAPI Api { get; set; }
 
 
-        public ManageTraitBehaviour(CollectibleObject collObj) : base(collObj)
+        public ManageTraitBehavior(CollectibleObject collObj) : base(collObj)
         {
         }
 
@@ -107,7 +107,7 @@ namespace TraitLearner.CollectibleBehaviours
         {
             return new WorldInteraction[]
             {
-                new WorldInteraction(){MouseButton = EnumMouseButton.Right, ActionLangCode = $"{Constants.DomainName}:traitbehaviour_use"}
+                new WorldInteraction(){MouseButton = EnumMouseButton.Right, ActionLangCode = $"{Constants.DomainName}:traitbehavior_use"}
             };
         }
     }

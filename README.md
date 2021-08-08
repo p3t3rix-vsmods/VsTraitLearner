@@ -1,6 +1,6 @@
 # TraitLearner
 A utility mod for VintageStory that allows learning new Traits. No Recipes get added because i can't judge how your server wants to balance this out (only dungeon loot, craftable, etc.).
-It adds Commands and a CollectibleBehaviour to add/remove Traits (and apply stat bonus/malus) and adds an overview of extra Traits to the character-tab.
+It adds Commands and a CollectibleBehavior to add/remove Traits (and apply stat bonus/malus) and adds an overview of extra Traits to the character-tab.
 
 ![TraitLearner-screenshot](https://gitlab.com/P3t3rix/vstraitlearner/uploads/a9fa0534e38f2a32d3e0a5410bde9d2f/image.png)
 
@@ -17,7 +17,7 @@ The following Commands are added [] are needed, () are optional, everything exce
   `/traitlearner reset (playerName)`
 
 
-## Behaviours
+## Behaviors
 
 The following CollectibleBehavior gets added:
 
